@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Registration;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class RegistrationTest extends TestCase
 {
@@ -22,7 +23,7 @@ final class RegistrationTest extends TestCase
 
         $this->expectException(Exception::class);
 
-        $greeter->validate(
+        $greeter->checkRequiredFields(
             [
                 'mail' => "raffianmoin@gmail.com",
                 'password' => "123456",
@@ -35,7 +36,7 @@ final class RegistrationTest extends TestCase
     {
         $greeter = new Registration();
 
-        $result = $greeter->validate(
+        $result = $greeter->checkRequiredFields(
             [
                 'email' => "raffianmoin@gmail.com",
                 'password' => "123456",
@@ -44,5 +45,44 @@ final class RegistrationTest extends TestCase
         );
 
         $this->assertTrue($result);
+    }
+
+    #[DataProvider('inputProvider')]
+    public function test_it_throws_error_for_invalid_input(array $inputData) : void
+    {
+        $greeter = new Registration();
+
+        $this->expectException(Exception::class);
+
+        $greeter->validateInput(
+            $inputData
+        );
+    }
+
+    public static function inputProvider(): array
+    {
+        return [
+                [
+                    [
+                        'email' => 'raffianmoin@gmailcom',
+                        'password' => '12345678',
+                        'confirm_password' => '12345678'
+                    ]
+                ],
+                [
+                    [
+                        'email' => 'raffianmoin@gmail.com',
+                        'password' => '12345',
+                        'confirm_password' => '12345678'
+                    ]
+                ],
+                [
+                    [
+                        'email' => 'raffianmoin@gmail.com',
+                        'password' => '12345678',
+                        'confirm_password' => '1234567'
+                    ]
+                ],
+        ];
     }
 }
