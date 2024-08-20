@@ -17,13 +17,19 @@ final class RegistrationTest extends TestCase
     //     // $this->assertSame('Hello, Alice!', $greeting);
     // }
 
+    protected $registrationObj = null;
+
+    protected function setUp(): void
+    {
+        $this->registrationObj = new Registration();
+    }
+
     public function test_it_throws_error_if_any_required_field_is_missing(): void
     {
-        $greeter = new Registration();
 
         $this->expectException(Exception::class);
 
-        $greeter->checkRequiredFields(
+        $this->registrationObj->checkRequiredFields(
             [
                 'mail' => "raffianmoin@gmail.com",
                 'password' => "123456",
@@ -34,9 +40,9 @@ final class RegistrationTest extends TestCase
 
     public function test_it_passes_if_all_required_fields_are_given(): void
     {
-        $greeter = new Registration();
+        $this->registrationObj = new Registration();
 
-        $result = $greeter->checkRequiredFields(
+        $result = $this->registrationObj->checkRequiredFields(
             [
                 'email' => "raffianmoin@gmail.com",
                 'password' => "123456",
@@ -50,13 +56,26 @@ final class RegistrationTest extends TestCase
     #[DataProvider('inputProvider')]
     public function test_it_throws_error_for_invalid_input(array $inputData) : void
     {
-        $greeter = new Registration();
 
         $this->expectException(Exception::class);
 
-        $greeter->validateInput(
+        $this->registrationObj->validateInput(
             $inputData
         );
+    }
+
+    public function test_it_passes_if_all_input_are_valid(): void
+    {
+
+        $result = $this->registrationObj->validateInput(
+            [
+                'email' => "raffianmoin@gmail.com",
+                'password' => "12345678",
+                'confirm_password' => "12345678",
+            ]
+        );
+
+        $this->assertTrue($result);
     }
 
     public static function inputProvider(): array
@@ -84,5 +103,10 @@ final class RegistrationTest extends TestCase
                     ]
                 ],
         ];
+    }
+
+    protected function tearDown(): void
+    {
+        $this->registrationObj = null;
     }
 }

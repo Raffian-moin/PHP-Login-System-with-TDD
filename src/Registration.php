@@ -6,7 +6,13 @@ class Registration
 {
     public function register()
     {
-
+        $formData = [];
+        try {
+            $this->checkRequiredFields($formData);
+            $this->validateInput($formData);
+        } catch (\Throwable $th) {
+            //throw $th;;
+        }
     }
 
     public function checkRequiredFields($formData)
@@ -36,6 +42,6 @@ class Registration
             throw new \Exception("Confirmation password did not match password", 1);
         }
 
-        return;
+        return true;
     }
 }
