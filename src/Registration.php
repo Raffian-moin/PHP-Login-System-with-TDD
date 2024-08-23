@@ -1,17 +1,54 @@
 <?php
-
 namespace App;
+
+require "./vendor/autoload.php";
+
+use PDO;
+use App\DatabaseConfig;
 
 class Registration
 {
-    public function register()
+    public function dbConnect()
     {
-        $formData = [];
+        $DbConfig = new DatabaseConfig();
+        $host = $DbConfig->host;
+        $db = $DbConfig->db;
+        $user = $DbConfig->user;
+        $password = $DbConfig->password;
+
+        $dsn = "mysql:host=$host;dbname=$db;charset=UTF8";
+        $pdo = new PDO($dsn, $user, $password);
+
+        return $pdo;
+    }
+
+    public function register($formData)
+    {
+        // $formData = [];
         try {
             $this->checkRequiredFields($formData);
             $this->validateInput($formData);
+
+            $pdo = $this->dbConnect();
+
+            $sql = 'INSERT INTO users(full_name, email, password) VALUES(:full_name, :email, :password)';
+
+            $statement = $pdo->prepare($sql);
+
+            $statement->execute([
+                ':full_name' => $formData['full_name'],
+                ':email' => $formData['email'],
+                ':password' => $formData['password'],
+            ]);
+
+            $userId = $pdo->lastInsertId();
+            if ($userId) {
+                echo "User created successfully";
+            }
+
         } catch (\Throwable $th) {
             //throw $th;;
+            echo $th->getMessage();
         }
     }
 
@@ -45,3 +82,12 @@ class Registration
         return true;
     }
 }
+
+$registration = new Registration();
+
+$registration->register([
+    'full_name'=> 'Raffian Moin',
+    'email'=> 'raf@gmail.con',
+    'password' => '12345678',
+    'confirm_password' => '12345678'
+]);
